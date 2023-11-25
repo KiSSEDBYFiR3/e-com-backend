@@ -1,0 +1,12 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Map<String, dynamic> _$UserAuthResponseToJson(UserAuthResponse instance) =>
+    <String, dynamic>{
+      'user_id': instance.userId,
+      'email': instance.email,
+      'name': instance.name,
+      'refresh_token': instance.refreshToken,
+      'access_token': instance.accessToken,
+    };

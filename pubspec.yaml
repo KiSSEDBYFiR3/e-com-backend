@@ -1,0 +1,25 @@
+name: soc_backend
+description: An empty conduit application.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=3.0.1 <4.0.0"
+
+dependencies:
+  conduit: ^4.3.7
+  conduit_core: ^4.3.6
+  conduit_postgresql: ^4.4.0
+  googleapis: ^11.4.0
+  yaml: ^3.1.0
+  uuid: ^3.0.7
+  jaguar_jwt: ^3.0.0
+  http: ^1.1.0
+  json_serializable: ^6.7.1
+  json_annotation: ^4.8.1
+
+
+dev_dependencies:
+  test: ^1.21.6
+  conduit_test: ^4.3.6
+  build_runner: ^2.4.6

@@ -1,0 +1,24 @@
+version: "1.0"
+   
+services:
+  postgres:
+    image: postgres:14.5
+    container_name: soc_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: soc_user
+      POSTGRES_PASSWORD: Shadows0fCha0s!
+      POSTGRES_DB: soc_db
+      POSTGRES_PORT: 5432
+    ports:
+      - 127.0.0.1:5432:5432
+  pgadmin:
+    container_name: pgadmin4_soc
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: paradox_zero@mail.ru
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - 127.0.0.1:5050:5050
+  

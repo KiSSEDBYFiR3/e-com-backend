@@ -4,14 +4,13 @@ RUN mkdir /app
 
 WORKDIR /app
 
-RUN dart pub get --no-precompile
-ADD . /app/
+COPY . .
 
-RUN dart pub get --offline --no-precompile
+RUN dart pub get
 
 RUN dart pub global activate conduit
 
-COPY . .
+
 
 EXPOSE 80
 

@@ -12,7 +12,7 @@ class _User {
     this.userId = '',
   });
 
-  @Column(primaryKey: true)
+  @Column(primaryKey: true, autoincrement: true)
   int? id;
   @Column()
   String? userId;

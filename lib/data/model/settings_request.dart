@@ -1,6 +1,6 @@
 import 'package:conduit_common/src/openapi/documentable.dart';
-import 'package:soc_backend/soc_backend.dart';
 import 'package:conduit_open_api/src/v3/schema.dart';
+import 'package:soc_backend/soc_backend.dart';
 
 class SettingsRequest implements Serializable {
   SettingsRequest({
@@ -30,8 +30,13 @@ class SettingsRequest implements Serializable {
 
   @override
   APISchemaObject documentSchema(APIDocumentContext context) {
-    // TODO: implement documentSchema
-    throw UnimplementedError();
+    return APISchemaObject.object({
+      'volume_level': APISchemaObject.number(),
+      'dialogues_window_type': APISchemaObject.string(),
+      'static_text': APISchemaObject.string(),
+      'pages_change_effect': APISchemaObject.string(),
+      'text_growth_speed': APISchemaObject.number(),
+    });
   }
 
   @override

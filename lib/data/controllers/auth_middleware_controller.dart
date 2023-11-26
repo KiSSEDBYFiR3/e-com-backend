@@ -5,7 +5,7 @@ import 'package:soc_backend/soc_backend.dart';
 import 'package:soc_backend/util/app_error_response.dart';
 import 'package:soc_backend/util/env_constants.dart';
 
-class AuthMidllerwareController extends Controller {
+class AuthMiddlewareController extends Controller {
   @override
   FutureOr<RequestOrResponse?> handle(Request request) {
     try {

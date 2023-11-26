@@ -5,16 +5,16 @@ import 'package:soc_backend/data/model/auth_response.dart';
 import 'package:soc_backend/data/model/user.dart';
 import 'package:soc_backend/domain/repository/auth_repository.dart';
 import 'package:soc_backend/soc_backend.dart';
-import 'package:soc_backend/util/app_error_response.dart';
 import 'package:soc_backend/util/env_constants.dart';
+import 'package:soc_backend/util/user_not_found.dart';
 
 class AuthRepository implements IAuthRepository {
   late String accessToken;
   late String refreshToken;
 
   @override
-  Future<Response> authorize(AuthRequest authRequest, ManagedContext context,
-      Oauth2Api oauth2api) async {
+  Future<UserAuthResponse> authorize(AuthRequest authRequest,
+      ManagedContext context, Oauth2Api oauth2api) async {
     try {
       final Tokeninfo tokeninfo = await oauth2api.tokeninfo(
         accessToken: authRequest.accessToken,
@@ -46,7 +46,7 @@ class AuthRepository implements IAuthRepository {
           accessToken: accessToken,
         );
 
-        return Response.ok(response.toJson());
+        return response;
       }
 
       await _updateToken(userData.id ?? 0, context, jwtSecretKey);
@@ -58,9 +58,9 @@ class AuthRepository implements IAuthRepository {
         accessToken: accessToken,
       );
 
-      return Response.ok(response.toJson());
-    } on QueryException catch (e) {
-      return AppResponse.serverError(e, message: e.message);
+      return response;
+    } on QueryException catch (_) {
+      rethrow;
     }
   }
 
@@ -88,5 +88,35 @@ class AuthRepository implements IAuthRepository {
     final refreshClaimSet =
         JwtClaim(maxAge: const Duration(days: 60), otherClaims: {'id': userId});
     return issueJwtHS256(refreshClaimSet, secretKey);
+  }
+
+  @override
+  Future<UserAuthResponse> updateFreeToken(
+      String token, ManagedContext context) async {
+    try {
+      final jwtSecretKey = EnvironmentConstants.jwtSecretKey;
+      final jwtToken = verifyJwtHS256Signature(token, jwtSecretKey);
+      jwtToken.validate();
+
+      final id = int.parse(jwtToken['id'].toString());
+
+      final user = await (Query<User>(context)..where((x) => x.id).equalTo(id))
+          .fetchOne();
+
+      if (user == null) {
+        throw UserNotFound();
+      }
+
+      await _updateToken(user.id!, context, jwtSecretKey);
+
+      return UserAuthResponse(
+        userId: user.userId ?? '',
+        email: user.email ?? '',
+        refreshToken: refreshToken,
+        accessToken: accessToken,
+      );
+    } on JwtException catch (_) {
+      rethrow;
+    }
   }
 }

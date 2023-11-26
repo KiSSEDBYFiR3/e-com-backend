@@ -17,8 +17,11 @@ class SavesRequest implements Serializable {
 
   @override
   APISchemaObject documentSchema(APIDocumentContext context) {
-    // TODO: implement documentSchema
-    throw UnimplementedError();
+    return APISchemaObject.object({
+      'id': APISchemaObject.integer(),
+      'batch_id': APISchemaObject.string(),
+      'saved_page_num': APISchemaObject.string(),
+    });
   }
 
   @override

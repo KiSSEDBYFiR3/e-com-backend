@@ -5,17 +5,21 @@ import 'package:googleapis/oauth2/v2.dart';
 import 'package:soc_backend/core/di/di.dart';
 import 'package:soc_backend/core/exception/db_configuration_exception.dart';
 import 'package:soc_backend/core/init_service_locator.dart';
+import 'package:soc_backend/data/controllers/api_docs_controller.dart';
 import 'package:soc_backend/data/controllers/auth_controller.dart';
+import 'package:soc_backend/data/controllers/auth_free_token_controller.dart';
 import 'package:soc_backend/data/controllers/auth_middleware_controller.dart';
 import 'package:soc_backend/data/controllers/pages_controller.dart';
 import 'package:soc_backend/data/controllers/saves_controller.dart';
 import 'package:soc_backend/data/controllers/settings_controller.dart';
 import 'package:soc_backend/data/repository/auth_repository.dart';
+import 'package:soc_backend/domain/repository/auth_repository.dart';
 import 'package:soc_backend/domain/repository/pages_repository.dart';
 import 'package:soc_backend/domain/repository/saves_repository.dart';
 import 'package:soc_backend/domain/repository/settings_repository.dart';
 import 'package:soc_backend/soc_backend.dart' hide AuthController;
 import 'package:soc_backend/util/env_constants.dart';
+import 'package:soc_backend/util/routes.dart';
 import 'package:yaml/yaml.dart';
 
 class SocBackendChannel extends ApplicationChannel {
@@ -44,27 +48,31 @@ class SocBackendChannel extends ApplicationChannel {
 
     // Prefer to use `link` instead of `linkFunction`.
     router
-      ..route('/auth').link(
+      ..route(Routes.auth).link(
         () => AuthController(
           sl.getObject(Oauth2Api),
           context,
-          sl.getObject(AuthRepository),
+          sl.getObject(IAuthRepository),
         ),
       )
-      ..route('/pages/[:id]')
-          .link(AuthMidllerwareController.new)
+      ..route(Routes.freeToken).link(
+          () => AuthFreeTokenController(context, sl.getObject(IAuthRepository)))
+      ..route(Routes.pages)
+          .link(AuthMiddlewareController.new)
           ?.link(() => PagesController(context, sl.getObject(IPagesRepository)))
-      ..route('/user_settings').link(AuthMidllerwareController.new)?.link(
+      ..route(Routes.settings).link(AuthMiddlewareController.new)?.link(
           () => SettingsController(context, sl.getObject(ISettingsRepository)))
-      ..route('/saves').link(AuthMidllerwareController.new)?.link(
-          () => SavesController(context, sl.getObject(ISavesRepository)));
+      ..route(Routes.saves)
+          .link(AuthMiddlewareController.new)
+          ?.link(() => SavesController(context, sl.getObject(ISavesRepository)))
+      ..route(Routes.docs).link(() => FileController(Directory.current.path));
 
     return router;
   }
 
   Future<PersistentStore> _configureDB() async {
     try {
-      final configFile = await File('db.yaml').readAsString();
+      final configFile = await File('config.yaml').readAsString();
       final yaml = loadYaml(configFile);
 
       final fail = (String msg) =>

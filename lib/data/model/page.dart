@@ -7,7 +7,7 @@ class Page extends ManagedObject<_Page> implements _Page {}
 
 @JsonSerializable(
   createToJson: true,
-  createFactory: false,
+  createFactory: true,
   fieldRename: FieldRename.snake,
 )
 @Table(name: 'pages', useSnakeCaseColumnName: true)
@@ -62,4 +62,5 @@ class _Page {
   final String soundTrack;
 
   Map<String, dynamic> toJson() => _$PageToJson(this);
+  factory _Page.fromJson(Map<String, dynamic> json) => _$PageFromJson(json);
 }

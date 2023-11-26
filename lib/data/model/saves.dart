@@ -7,7 +7,7 @@ class Save extends ManagedObject<_Save> implements _Save {}
 
 @JsonSerializable(
   createToJson: true,
-  createFactory: false,
+  createFactory: true,
   fieldRename: FieldRename.snake,
 )
 @Table(name: 'saves', useSnakeCaseColumnName: true)
@@ -32,4 +32,6 @@ class _Save {
   String savedPageNum;
 
   Map<String, dynamic> toJson() => _$SaveToJson(this);
+
+  factory _Save.fromJson(Map<String, dynamic> json) => _$SaveFromJson(json);
 }

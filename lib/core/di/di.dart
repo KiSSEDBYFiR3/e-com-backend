@@ -15,6 +15,7 @@ class ServiceLocator {
 
   void registerSingltoneAs(Type type, Object object) {
     _objects[type] = object;
+    print(_objects);
   }
 
   T getObject<T extends Object>(Type? type) {

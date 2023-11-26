@@ -7,7 +7,7 @@ class Settings extends ManagedObject<_Settings> implements _Settings {}
 
 @JsonSerializable(
   createToJson: true,
-  createFactory: false,
+  createFactory: true,
   fieldRename: FieldRename.snake,
 )
 @Table(name: 'settings', useSnakeCaseColumnName: true)
@@ -40,4 +40,7 @@ class _Settings {
   double? textGrowthSpeed;
 
   Map<String, dynamic> toJson() => _$SettingsToJson(this);
+
+  factory _Settings.fromJson(Map<String, dynamic> json) =>
+      _$SettingsFromJson(json);
 }

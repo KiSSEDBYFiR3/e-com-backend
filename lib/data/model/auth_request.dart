@@ -19,14 +19,16 @@ class AuthRequest implements Serializable {
 
   @override
   void readFromMap(Map<String, dynamic> object) {
-    idToken = object['idToken'];
-    accessToken = object['accessToken'];
+    idToken = object['id_token'];
+    accessToken = object['access_token'];
   }
 
   @override
   APISchemaObject documentSchema(APIDocumentContext context) {
-    // TODO: implement documentSchema
-    throw UnimplementedError();
+    return APISchemaObject.object({
+      'id_token': APISchemaObject.string(),
+      'access_token': APISchemaObject.string(),
+    });
   }
 
   @override

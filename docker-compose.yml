@@ -1,4 +1,4 @@
-version: "1.0"
+version: "3.8"
    
 services:
   postgres:
@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: soc_user
-      POSTGRES_PASSWORD: Shadows0fCha0s!
+      POSTGRES_PASSWORD: Shadows0fCha0s
       POSTGRES_DB: soc_db
       POSTGRES_PORT: 5432
     ports:
@@ -20,5 +20,9 @@ services:
       PGADMIN_DEFAULT_EMAIL: paradox_zero@mail.ru
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
-      - 127.0.0.1:5050:5050
+      - 127.0.0.1:5354:80
+  backend:
+    build: .
+    ports:
+        - "8000:80" 
   

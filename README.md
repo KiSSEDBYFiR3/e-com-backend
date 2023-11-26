@@ -1,6 +1,6 @@
 # Shadows of Chaos Backend
 
-A backend for my other project - visual novel Shadows of Chaos.
+A backend for my other project - visual novel Shadows of Chaos(https://github.com/KiSSEDBYFiR3/shadows-of-chaos).
 
 
 ## Running the Application Locally

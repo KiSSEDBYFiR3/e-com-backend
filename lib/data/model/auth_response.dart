@@ -12,12 +12,14 @@ part 'auth_response.g.dart';
 )
 class UserAuthResponse implements Serializable {
   const UserAuthResponse({
-    required this.userId,
+    required this.id,
     required this.email,
     required this.refreshToken,
     required this.accessToken,
+    required this.userId,
     this.name,
   });
+  final int id;
   final String userId;
   final String email;
   final String? name;

@@ -296,6 +296,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "jwt_decoder",
+      "rootUri": "file:///Users/Stanislav/.pub-cache/hosted/pub.dev/jwt_decoder-2.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "logging",
       "rootUri": "file:///Users/Stanislav/.pub-cache/hosted/pub.dev/logging-1.2.0",
       "packageUri": "lib/",
@@ -566,7 +572,7 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2023-11-25T17:44:47.102412Z",
+  "generated": "2023-11-27T20:52:37.334956Z",
   "generator": "pub",
   "generatorVersion": "3.1.4"
 }

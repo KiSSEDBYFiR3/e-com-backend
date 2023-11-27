@@ -9,7 +9,6 @@ class _User {
     this.name = '',
     this.id = 0,
     this.refreshToken = '',
-    this.userId = '',
   });
 
   @Column(primaryKey: true, autoincrement: true)

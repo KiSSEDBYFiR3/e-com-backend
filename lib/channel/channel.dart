@@ -49,8 +49,7 @@ class SocBackendChannel extends ApplicationChannel {
     // Prefer to use `link` instead of `linkFunction`.
     router
       ..route(Routes.auth).link(
-        () => AuthController(
-          sl.getObject(Oauth2Api),
+        () => AuthorizationController(
           context,
           sl.getObject(IAuthRepository),
         ),

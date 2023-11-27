@@ -35,8 +35,12 @@ class AuthFreeTokenController extends ResourceController {
       '200': APIResponse.schema(
         '',
         const UserAuthResponse(
-                accessToken: '', userId: '', email: '', refreshToken: '')
-            .documentSchema(context),
+          accessToken: '',
+          userId: '',
+          email: '',
+          refreshToken: '',
+          id: 0,
+        ).documentSchema(context),
       )
     };
   }

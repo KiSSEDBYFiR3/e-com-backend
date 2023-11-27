@@ -12,26 +12,24 @@ import 'package:soc_backend/domain/repository/auth_repository.dart';
 import 'package:soc_backend/soc_backend.dart';
 import 'package:soc_backend/util/app_error_response.dart';
 
-class AuthController extends ResourceController {
-  AuthController(
-    this.oauth2api,
+class AuthorizationController extends ResourceController {
+  AuthorizationController(
     this.context,
     this.authRepository,
   );
 
-  final Oauth2Api oauth2api;
   final ManagedContext context;
   final IAuthRepository authRepository;
 
   late String accessToken;
   late String refreshToken;
   @Operation.post()
-  Future<Response> authByGoogleToken(
-    @Bind.body(require: ['idToken', 'accessToken']) AuthRequest authRequest,
+  Future<Response> authorize(
+    @Bind.body(require: ['id_token', 'access_token']) AuthRequest authRequest,
   ) async {
     try {
-      final response =
-          await authRepository.authorize(authRequest, context, oauth2api);
+      final response = await authRepository.authorize(authRequest, context);
+
       return Response.ok(response);
     } on JwtException catch (e) {
       return AppResponse.unauthorized(
@@ -39,9 +37,10 @@ class AuthController extends ResourceController {
         details: e.message,
       );
     } on QueryException catch (e) {
+      print(e.toString());
       return AppResponse.serverError(e, message: e.message);
     } catch (e) {
-      dev.log(e.toString());
+      print(e);
       return AppResponse.badRequest(details: 'token is incorrect');
     }
   }
@@ -53,8 +52,12 @@ class AuthController extends ResourceController {
       '200': APIResponse.schema(
           '',
           const UserAuthResponse(
-                  accessToken: '', userId: '', email: '', refreshToken: '')
-              .documentSchema(context))
+            accessToken: '',
+            userId: '',
+            email: '',
+            refreshToken: '',
+            id: 0,
+          ).documentSchema(context))
     };
   }
 }

@@ -1,7 +1,8 @@
-import 'package:googleapis/oauth2/v2.dart';
 import 'package:jaguar_jwt/jaguar_jwt.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:soc_backend/data/model/auth_request.dart';
 import 'package:soc_backend/data/model/auth_response.dart';
+import 'package:soc_backend/data/model/token_info.dart';
 import 'package:soc_backend/data/model/user.dart';
 import 'package:soc_backend/domain/repository/auth_repository.dart';
 import 'package:soc_backend/soc_backend.dart';
@@ -13,27 +14,24 @@ class AuthRepository implements IAuthRepository {
   late String refreshToken;
 
   @override
-  Future<UserAuthResponse> authorize(AuthRequest authRequest,
-      ManagedContext context, Oauth2Api oauth2api) async {
+  Future<UserAuthResponse> authorize(
+      AuthRequest authRequest, ManagedContext context) async {
     try {
-      final Tokeninfo tokeninfo = await oauth2api.tokeninfo(
-        accessToken: authRequest.accessToken,
-        idToken: authRequest.idToken,
-      );
+      final jsonTokenInfo = JwtDecoder.decode(authRequest.idToken);
+
+      final tokenInfo = TokenInfo.fromJson(jsonTokenInfo);
       final query = Query<User>(
         context,
       );
 
-      final findUser = query..where((x) => x.userId).equalTo(tokeninfo.userId);
+      final findUser = query..where((x) => x.userId).equalTo(tokenInfo.sub);
 
       final userData = await findUser.fetchOne();
 
       final String jwtSecretKey = EnvironmentConstants.jwtSecretKey;
 
       if (userData == null) {
-        final createUser = query
-          ..values.userId = tokeninfo.userId
-          ..values.email = tokeninfo.email;
+        final createUser = query..values.email = tokenInfo.email;
 
         final user = await createUser.insert();
 
@@ -41,6 +39,7 @@ class AuthRepository implements IAuthRepository {
 
         final response = UserAuthResponse(
           userId: user.userId ?? '',
+          id: user.id ?? 0,
           email: user.email ?? '',
           refreshToken: refreshToken,
           accessToken: accessToken,
@@ -52,6 +51,7 @@ class AuthRepository implements IAuthRepository {
       await _updateToken(userData.id ?? 0, context, jwtSecretKey);
 
       final response = UserAuthResponse(
+        id: userData.id ?? 0,
         userId: userData.userId ?? '',
         email: userData.email ?? '',
         refreshToken: refreshToken,
@@ -60,6 +60,7 @@ class AuthRepository implements IAuthRepository {
 
       return response;
     } on QueryException catch (_) {
+      print(_);
       rethrow;
     }
   }
@@ -111,6 +112,7 @@ class AuthRepository implements IAuthRepository {
 
       return UserAuthResponse(
         userId: user.userId ?? '',
+        id: user.id ?? 0,
         email: user.email ?? '',
         refreshToken: refreshToken,
         accessToken: accessToken,

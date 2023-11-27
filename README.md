@@ -9,4 +9,4 @@ Built using [Conduit Framework](https://conduit.io).
 
 To run type `docker-compose up` in project directory's command line.
 
-To look for `Documentation` you should use `/docs` endpoint in your address bar.
+To view `Documentation` you should use `/docs` endpoint in your address bar.

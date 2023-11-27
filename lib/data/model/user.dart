@@ -13,7 +13,7 @@ class _User {
 
   @Column(primaryKey: true, autoincrement: true)
   int? id;
-  @Column()
+  @Column(nullable: true)
   String? userId;
   @Column()
   String? email;

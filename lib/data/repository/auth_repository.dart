@@ -30,12 +30,16 @@ class AuthRepository implements IAuthRepository {
 
       final String jwtSecretKey = EnvironmentConstants.jwtSecretKey;
 
+      await _updateToken(tokenInfo.sub, context, jwtSecretKey);
+
       if (userData == null) {
-        final createUser = query..values.email = tokenInfo.email;
+        final createUser = query
+          ..values.email = tokenInfo.email
+          ..values.name = tokenInfo.name
+          ..values.userId = tokenInfo.sub
+          ..values.refreshToken = refreshToken;
 
         final user = await createUser.insert();
-
-        await _updateToken(user.id ?? 0, context, jwtSecretKey);
 
         final response = UserAuthResponse(
           userId: user.userId ?? '',
@@ -48,7 +52,7 @@ class AuthRepository implements IAuthRepository {
         return response;
       }
 
-      await _updateToken(userData.id ?? 0, context, jwtSecretKey);
+      await _updateToken(userData.userId ?? '', context, jwtSecretKey);
 
       final response = UserAuthResponse(
         id: userData.id ?? 0,
@@ -66,26 +70,26 @@ class AuthRepository implements IAuthRepository {
   }
 
   Future<void> _updateToken(
-      int userId, ManagedContext transaction, String jwtSecretKey) async {
+      String userId, ManagedContext transaction, String jwtSecretKey) async {
     refreshToken = _getRefreshToken(jwtSecretKey, userId);
 
     final qUpdateTokens = Query<User>(transaction)
       ..values.refreshToken = refreshToken
-      ..where((x) => x.id).equalTo(userId);
+      ..where((x) => x.userId).equalTo(userId);
 
     await qUpdateTokens.updateOne();
 
     accessToken = _getAccessToken(jwtSecretKey, userId);
   }
 
-  String _getAccessToken(String secretKey, int userId,
+  String _getAccessToken(String secretKey, String userId,
       {Duration duration = const Duration(hours: 1)}) {
     final accessClaimSet =
         JwtClaim(maxAge: duration, otherClaims: {'id': userId});
     return issueJwtHS256(accessClaimSet, secretKey);
   }
 
-  String _getRefreshToken(String secretKey, int userId) {
+  String _getRefreshToken(String secretKey, String userId) {
     final refreshClaimSet =
         JwtClaim(maxAge: const Duration(days: 60), otherClaims: {'id': userId});
     return issueJwtHS256(refreshClaimSet, secretKey);
@@ -108,7 +112,7 @@ class AuthRepository implements IAuthRepository {
         throw UserNotFound();
       }
 
-      await _updateToken(user.id!, context, jwtSecretKey);
+      await _updateToken(user.userId!, context, jwtSecretKey);
 
       return UserAuthResponse(
         userId: user.userId ?? '',

@@ -1,14 +1,26 @@
 import 'package:conduit_core/conduit_core.dart';
+import 'package:googleapis/calendar/v3.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:soc_backend/data/model/saves.dart';
+
+part 'user.g.dart';
 
 class User extends ManagedObject<_User> implements _User {}
 
+@JsonSerializable(
+  createFactory: false,
+  createToJson: true,
+  fieldRename: FieldRename.snake,
+)
 @Table(name: 'users', useSnakeCaseColumnName: true)
 class _User {
   _User({
-    this.email = '',
-    this.name = '',
-    this.id = 0,
-    this.refreshToken = '',
+    this.email,
+    this.name,
+    this.id,
+    this.refreshToken,
+    this.settings,
+    this.saves,
   });
 
   @Column(primaryKey: true, autoincrement: true)
@@ -21,4 +33,10 @@ class _User {
   String? name;
   @Column()
   String? refreshToken;
+
+  Settings? settings;
+
+  ManagedSet<Save>? saves;
+
+  Map<String, dynamic> toJson() => _$UserToJson(this);
 }

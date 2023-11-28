@@ -7,6 +7,12 @@
 
 Built using [Conduit Framework](https://conduit.io).
 
-To run type `docker-compose up` in project directory's command line.
+To successfuly build and run app you will need installed `Docker` on your machine.
 
-To view `Documentation` you should use `/docs` endpoint in your address bar.
+First you'll need to activate `Conduit CLI` by running `dart pub global activate conduit`
+
+Enter `docker-compose up` into the project directory's command line.
+
+Then enter `conduit db upgrade` to upgrade data base scheme
+
+To view `Documentation` you should check `/docs` endpoin

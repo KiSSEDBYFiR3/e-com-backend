@@ -7,4 +7,8 @@ abstract interface class ISavesRepository {
 
   Future<Save?> save(
       SavesRequest savesRequest, String userId, ManagedContext context);
+
+  Future<Save?> createSave(SavesRequest savesRequest, ManagedContext context);
+  Future<void> deleteSave(
+      SavesRequest savesRequest, String userId, ManagedContext context);
 }

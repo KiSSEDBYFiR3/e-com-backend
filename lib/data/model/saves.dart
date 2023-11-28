@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:soc_backend/data/model/user.dart';
 import 'package:soc_backend/soc_backend.dart';
 
 part 'saves.g.dart';
@@ -7,7 +8,7 @@ class Save extends ManagedObject<_Save> implements _Save {}
 
 @JsonSerializable(
   createToJson: true,
-  createFactory: true,
+  createFactory: false,
   fieldRename: FieldRename.snake,
 )
 @Table(name: 'saves', useSnakeCaseColumnName: true)
@@ -16,14 +17,10 @@ class _Save {
     this.batchId = '',
     this.savedPageNum = '',
     this.id,
-    this.userId = '',
   });
 
   @Column(primaryKey: true, autoincrement: true)
   final int? id;
-
-  @Column()
-  String userId;
 
   @Column()
   String batchId;
@@ -31,7 +28,8 @@ class _Save {
   @Column()
   String savedPageNum;
 
-  Map<String, dynamic> toJson() => _$SaveToJson(this);
+  @Relate(#saves)
+  User? user;
 
-  factory _Save.fromJson(Map<String, dynamic> json) => _$SaveFromJson(json);
+  Map<String, dynamic> toJson() => _$SaveToJson(this);
 }

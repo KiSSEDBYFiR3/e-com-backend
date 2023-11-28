@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:soc_backend/data/model/user.dart';
 import 'package:soc_backend/soc_backend.dart';
 
 part 'settings.g.dart';
@@ -7,7 +8,7 @@ class Settings extends ManagedObject<_Settings> implements _Settings {}
 
 @JsonSerializable(
   createToJson: true,
-  createFactory: true,
+  createFactory: false,
   fieldRename: FieldRename.snake,
 )
 @Table(name: 'settings', useSnakeCaseColumnName: true)
@@ -39,8 +40,8 @@ class _Settings {
   @Column(nullable: true)
   double? textGrowthSpeed;
 
-  Map<String, dynamic> toJson() => _$SettingsToJson(this);
+  @Relate(#settings)
+  User? user;
 
-  factory _Settings.fromJson(Map<String, dynamic> json) =>
-      _$SettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$SettingsToJson(this);
 }

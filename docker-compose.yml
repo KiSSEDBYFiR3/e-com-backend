@@ -12,6 +12,19 @@ services:
       POSTGRES_PORT: 5432
     ports:
       - 127.0.0.1:5432:5432
+    healthcheck:
+      test: pg_isready -U soc_user -d soc_db
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  backend:
+    build: 
+      dockerfile: Dockerfile
+    ports:
+        - "80:80" 
+    depends_on:
+      postgres:
+        condition: service_healthy
   pgadmin:
     container_name: pgadmin4_soc
     image: dpage/pgadmin4
@@ -21,8 +34,4 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - 127.0.0.1:5354:80
-  backend:
-    build: .
-    ports:
-        - "80:80" 
   

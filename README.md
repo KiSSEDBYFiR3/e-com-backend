@@ -15,4 +15,4 @@ Enter `docker-compose up` into the project directory's command line.
 
 Then enter `conduit db upgrade` to upgrade data base scheme
 
-To view `Documentation` you should check `/docs` endpoin
+To view `Documentation` you should check `/docs` endpoint

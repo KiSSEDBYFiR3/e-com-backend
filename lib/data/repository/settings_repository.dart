@@ -6,9 +6,9 @@ import 'package:soc_backend/soc_backend.dart';
 class SettingRepository implements ISettingsRepository {
   @override
   Future<Settings?> getSettings(String userId, ManagedContext context) async {
-    final query = Query<Settings>(context)..where((x) => x.id).equalTo(userId);
-
     try {
+      final query = Query<Settings>(context)
+        ..where((x) => x.user?.userId).equalTo(userId);
       final settings = await query.fetchOne();
       return settings;
     } on QueryException catch (_) {
@@ -24,7 +24,7 @@ class SettingRepository implements ISettingsRepository {
   ) async {
     try {
       final query = Query<Settings>(context)
-        ..where((x) => x.id).equalTo(userId)
+        ..where((x) => x.user?.userId).equalTo(userId)
         ..values.dialoguesWindowType = settingsRequest.dialoguesWindowType
         ..values.pagesChangeEffect = settingsRequest.pagesChangeEffect
         ..values.staticText = settingsRequest.staticText

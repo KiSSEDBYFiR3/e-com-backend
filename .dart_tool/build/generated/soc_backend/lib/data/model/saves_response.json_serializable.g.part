@@ -1,8 +1,0 @@
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-Map<String, dynamic> _$SavesResponseToJson(SavesResponse instance) =>
-    <String, dynamic>{
-      'saves': instance.saves,
-    };

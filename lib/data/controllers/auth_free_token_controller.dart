@@ -5,7 +5,7 @@ import 'package:soc_backend/data/model/auth_response.dart';
 import 'package:soc_backend/domain/repository/auth_repository.dart';
 import 'package:soc_backend/soc_backend.dart';
 import 'package:soc_backend/util/app_error_response.dart';
-import 'package:soc_backend/util/user_not_found.dart';
+import 'package:soc_backend/core/exception/user_not_found.dart';
 
 class AuthFreeTokenController extends ResourceController {
   AuthFreeTokenController(this.context, this.authRepository);

@@ -2,12 +2,13 @@ import 'package:jaguar_jwt/jaguar_jwt.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:soc_backend/data/model/auth_request.dart';
 import 'package:soc_backend/data/model/auth_response.dart';
+import 'package:soc_backend/data/model/settings.dart';
 import 'package:soc_backend/data/model/token_info.dart';
 import 'package:soc_backend/data/model/user.dart';
 import 'package:soc_backend/domain/repository/auth_repository.dart';
 import 'package:soc_backend/soc_backend.dart';
 import 'package:soc_backend/util/env_constants.dart';
-import 'package:soc_backend/util/user_not_found.dart';
+import 'package:soc_backend/core/exception/user_not_found.dart';
 
 class AuthRepository implements IAuthRepository {
   late String accessToken;
@@ -20,48 +21,66 @@ class AuthRepository implements IAuthRepository {
       final jsonTokenInfo = JwtDecoder.decode(authRequest.idToken);
 
       final tokenInfo = TokenInfo.fromJson(jsonTokenInfo);
-      final query = Query<User>(
-        context,
-      );
 
-      final findUser = query..where((x) => x.userId).equalTo(tokenInfo.sub);
+      final response =
+          await context.transaction<UserAuthResponse>((transaction) async {
+        final query = Query<User>(
+          transaction,
+        );
 
-      final userData = await findUser.fetchOne();
+        final findUser = query..where((x) => x.userId).equalTo(tokenInfo.sub);
 
-      final String jwtSecretKey = EnvironmentConstants.jwtSecretKey;
+        final userData = await findUser.fetchOne();
 
-      await _updateToken(tokenInfo.sub, context, jwtSecretKey);
+        final String jwtSecretKey = EnvironmentConstants.jwtSecretKey;
 
-      if (userData == null) {
-        final createUser = query
-          ..values.email = tokenInfo.email
-          ..values.name = tokenInfo.name
-          ..values.userId = tokenInfo.sub
-          ..values.refreshToken = refreshToken;
+        await _updateToken(tokenInfo.sub, transaction, jwtSecretKey);
 
-        final user = await createUser.insert();
+        if (userData == null) {
+          final createUser = query
+            ..values.email = tokenInfo.email
+            ..values.name = tokenInfo.name
+            ..values.userId = tokenInfo.sub
+            ..values.refreshToken = refreshToken
+            ..values.saves = ManagedSet.from([]);
+
+          final user = await createUser.insert();
+
+          final settingsQuery = Query<Settings>(transaction)
+            ..values.user = user
+            ..values.volumeLevel = 100
+            ..values.staticText = true
+            ..values.textGrowthSpeed = 0.5
+            ..values.pagesChangeEffect = 'normal'
+            ..values.dialoguesWindowType = 'adventure';
+
+          await settingsQuery.insert();
+
+          final response = UserAuthResponse(
+            userId: user.userId ?? '',
+            id: user.id ?? 0,
+            email: user.email ?? '',
+            refreshToken: refreshToken,
+            accessToken: accessToken,
+          );
+
+          return response;
+        }
+
+        await _updateToken(userData.userId ?? '', transaction, jwtSecretKey);
 
         final response = UserAuthResponse(
-          userId: user.userId ?? '',
-          id: user.id ?? 0,
-          email: user.email ?? '',
+          id: userData.id ?? 0,
+          userId: userData.userId ?? '',
+          email: userData.email ?? '',
           refreshToken: refreshToken,
           accessToken: accessToken,
         );
-
         return response;
+      });
+      if (response == null) {
+        throw Exception();
       }
-
-      await _updateToken(userData.userId ?? '', context, jwtSecretKey);
-
-      final response = UserAuthResponse(
-        id: userData.id ?? 0,
-        userId: userData.userId ?? '',
-        email: userData.email ?? '',
-        refreshToken: refreshToken,
-        accessToken: accessToken,
-      );
-
       return response;
     } on QueryException catch (_) {
       print(_);

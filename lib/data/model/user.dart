@@ -1,7 +1,7 @@
 import 'package:conduit_core/conduit_core.dart';
-import 'package:googleapis/calendar/v3.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:soc_backend/data/model/saves.dart';
+import 'package:soc_backend/data/model/settings.dart';
 
 part 'user.g.dart';
 

@@ -43,11 +43,13 @@ class PagesResponse implements Serializable {
   }
 
   @override
-  void read(Map<String, dynamic> object,
-      {Iterable<String>? accept,
-      Iterable<String>? ignore,
-      Iterable<String>? reject,
-      Iterable<String>? require}) {}
+  void read(
+    Map<String, dynamic> object, {
+    Iterable<String>? accept,
+    Iterable<String>? ignore,
+    Iterable<String>? reject,
+    Iterable<String>? require,
+  }) {}
 
   @override
   void readFromMap(Map<String, dynamic> object) {}

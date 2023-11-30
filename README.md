@@ -7,7 +7,7 @@
 
 Built using [Conduit Framework](https://conduit.io).
 
-To successfuly build and run app you will need installed `Docker` on your machine.
+To successfuly build and run app you will need to install `Docker` on your machine.
 
 First you'll need to activate `Conduit CLI` by running `dart pub global activate conduit`
 

@@ -15,15 +15,15 @@ class Settings extends ManagedObject<_Settings> implements _Settings {}
 class _Settings {
   _Settings({
     this.volumeLevel = 100,
-    this.id = '',
+    this.id = 0,
     this.pagesChangeEffect = 'none',
     this.dialoguesWindowType = 'bottomBarLike',
     this.staticText = true,
     this.textGrowthSpeed = 0,
   });
 
-  @Column(primaryKey: true)
-  final String id;
+  @Column(primaryKey: true, autoincrement: true)
+  final int id;
 
   @Column(nullable: true)
   double? volumeLevel;

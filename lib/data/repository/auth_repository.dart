@@ -41,8 +41,7 @@ class AuthRepository implements IAuthRepository {
             ..values.email = tokenInfo.email
             ..values.name = tokenInfo.name
             ..values.userId = tokenInfo.sub
-            ..values.refreshToken = refreshToken
-            ..values.saves = ManagedSet.from([]);
+            ..values.refreshToken = refreshToken;
 
           final user = await createUser.insert();
 

@@ -88,7 +88,7 @@ class SocBackendChannel extends ApplicationChannel {
           fail("DB_PASSWORD | password");
 
       final host =
-          EnvironmentConstants.dbHost ?? getYamlKey('host') ?? '127.0.0.1';
+          EnvironmentConstants.dbHost ?? getYamlKey('host') ?? 'postgres';
 
       final port = int.parse(
           EnvironmentConstants.dbPort ?? getYamlKey('port') ?? '5432');

@@ -3,7 +3,7 @@ import 'package:soc_backend/soc_backend.dart';
 Future main() async {
   final app = Application<SocBackendChannel>()
     ..options.configurationFilePath = "config.yaml"
-    ..options.port = 8888;
+    ..options.port = 80;
 
   await app.startOnCurrentIsolate();
 

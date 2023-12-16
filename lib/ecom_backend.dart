@@ -1,7 +1,7 @@
 /// soc_backend
 ///
 /// A conduit web server.
-library soc_backend;
+library ecom_backend;
 
 export 'dart:async';
 export 'dart:io';

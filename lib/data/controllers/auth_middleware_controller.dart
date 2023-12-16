@@ -1,9 +1,9 @@
 import 'dart:developer' as dev;
 
+import 'package:ecom_backend/ecom_backend.dart';
+import 'package:ecom_backend/util/app_error_response.dart';
+import 'package:ecom_backend/util/env_constants.dart';
 import 'package:jaguar_jwt/jaguar_jwt.dart';
-import 'package:soc_backend/soc_backend.dart';
-import 'package:soc_backend/util/app_error_response.dart';
-import 'package:soc_backend/util/env_constants.dart';
 
 class AuthMiddlewareController extends Controller {
   @override

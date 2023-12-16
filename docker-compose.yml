@@ -3,17 +3,17 @@ version: "3.8"
 services:
   postgres:
     image: postgres:14.5
-    container_name: soc_postgres
+    container_name: ecom_postgres
     restart: always
     environment:
-      POSTGRES_USER: soc_user
-      POSTGRES_PASSWORD: Shadows0fCha0s
-      POSTGRES_DB: soc_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: ecom_db
       POSTGRES_PORT: 5432
     ports:
       - 127.0.0.1:5432:5432
     healthcheck:
-      test: pg_isready -U soc_user -d soc_db
+      test: pg_isready -U user -d ecom_db
       interval: 30s
       timeout: 10s
       retries: 5
@@ -26,7 +26,7 @@ services:
       postgres:
         condition: service_healthy
   pgadmin:
-    container_name: pgadmin4_soc
+    container_name: pgadmin4
     image: dpage/pgadmin4
     restart: always
     environment:

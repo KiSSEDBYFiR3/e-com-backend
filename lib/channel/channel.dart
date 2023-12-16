@@ -1,28 +1,27 @@
 import 'dart:developer' as dev;
 
 import 'package:conduit_postgresql/conduit_postgresql.dart';
-import 'package:googleapis/oauth2/v2.dart';
-import 'package:soc_backend/core/di/di.dart';
-import 'package:soc_backend/core/exception/db_configuration_exception.dart';
-import 'package:soc_backend/core/init_service_locator.dart';
-import 'package:soc_backend/data/controllers/api_docs_controller.dart';
-import 'package:soc_backend/data/controllers/auth_controller.dart';
-import 'package:soc_backend/data/controllers/auth_free_token_controller.dart';
-import 'package:soc_backend/data/controllers/auth_middleware_controller.dart';
-import 'package:soc_backend/data/controllers/pages_controller.dart';
-import 'package:soc_backend/data/controllers/saves_controller.dart';
-import 'package:soc_backend/data/controllers/settings_controller.dart';
-import 'package:soc_backend/data/repository/auth_repository.dart';
-import 'package:soc_backend/domain/repository/auth_repository.dart';
-import 'package:soc_backend/domain/repository/pages_repository.dart';
-import 'package:soc_backend/domain/repository/saves_repository.dart';
-import 'package:soc_backend/domain/repository/settings_repository.dart';
-import 'package:soc_backend/soc_backend.dart' hide AuthController;
-import 'package:soc_backend/util/env_constants.dart';
-import 'package:soc_backend/util/routes.dart';
+import 'package:ecom_backend/core/di/di.dart';
+import 'package:ecom_backend/core/di/init_service_locator.dart';
+import 'package:ecom_backend/core/exception/db_configuration_exception.dart';
+import 'package:ecom_backend/data/controllers/auth_controller.dart';
+import 'package:ecom_backend/data/controllers/auth_free_token_controller.dart';
+import 'package:ecom_backend/data/controllers/auth_middleware_controller.dart';
+import 'package:ecom_backend/data/controllers/cart_controller.dart';
+import 'package:ecom_backend/data/controllers/favorites_controller.dart';
+import 'package:ecom_backend/data/controllers/order_controller.dart';
+import 'package:ecom_backend/data/controllers/products_controller.dart';
+import 'package:ecom_backend/domain/repository/auth_repository.dart';
+import 'package:ecom_backend/domain/repository/cart_repository.dart';
+import 'package:ecom_backend/domain/repository/favorites_repository.dart';
+import 'package:ecom_backend/domain/repository/order_repository.dart';
+import 'package:ecom_backend/domain/repository/products_repository.dart';
+import 'package:ecom_backend/ecom_backend.dart';
+import 'package:ecom_backend/util/env_constants.dart';
+import 'package:ecom_backend/util/routes.dart';
 import 'package:yaml/yaml.dart';
 
-class SocBackendChannel extends ApplicationChannel {
+class EcomBackendChannel extends ApplicationChannel {
   late final ManagedContext context;
   late final ServiceLocator sl;
   @override
@@ -46,7 +45,6 @@ class SocBackendChannel extends ApplicationChannel {
   Controller get entryPoint {
     final router = Router();
 
-    // Prefer to use `link` instead of `linkFunction`.
     router
       ..route(Routes.auth).link(
         () => AuthorizationController(
@@ -55,16 +53,42 @@ class SocBackendChannel extends ApplicationChannel {
         ),
       )
       ..route(Routes.freeToken).link(
-          () => AuthFreeTokenController(context, sl.getObject(IAuthRepository)))
-      ..route(Routes.pages)
-          .link(AuthMiddlewareController.new)
-          ?.link(() => PagesController(context, sl.getObject(IPagesRepository)))
-      ..route(Routes.settings).link(AuthMiddlewareController.new)?.link(
-          () => SettingsController(context, sl.getObject(ISettingsRepository)))
-      ..route(Routes.saves)
-          .link(AuthMiddlewareController.new)
-          ?.link(() => SavesController(context, sl.getObject(ISavesRepository)))
-      ..route(Routes.docs).link(() => FileController(Directory.current.path));
+        () => AuthFreeTokenController(
+          context,
+          sl.getObject(IAuthRepository),
+        ),
+      )
+      ..route(Routes.favorites)
+          .link(
+            AuthMiddlewareController.new,
+          )
+          ?.link(
+            () => FavoritesController(
+              context: context,
+              repository: sl.getObject(IFavoritesRepository),
+            ),
+          )
+      ..route(Routes.cart).link(AuthMiddlewareController.new)?.link(
+            () => CartController(
+              context: context,
+              repository: sl.getObject(ICartRepository),
+            ),
+          )
+      ..route(Routes.order).link(AuthMiddlewareController.new)?.link(
+            () => OrderController(
+              context: context,
+              repository: sl.getObject(IOrderRepository),
+            ),
+          )
+      ..route(Routes.products).link(AuthMiddlewareController.new)?.link(
+            () => ProductsController(
+              context: context,
+              repository: sl.getObject(IProductsRepository),
+            ),
+          )
+      ..route(Routes.docs).link(
+        () => FileController(Directory.current.path),
+      );
 
     return router;
   }

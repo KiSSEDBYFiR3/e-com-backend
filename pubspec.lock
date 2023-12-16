@@ -178,7 +178,7 @@ packages:
     source: hosted
     version: "4.4.0"
   conduit_common:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: conduit_common
       sha256: d4090291a838a9a5a08947285453aa042f19180e5849819d1f0680aec7866299
@@ -210,7 +210,7 @@ packages:
     source: hosted
     version: "4.4.0"
   conduit_open_api:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: conduit_open_api
       sha256: defc948645a53a69506c902203ca1e4579461fc79b35129641a8f31e88cb213b
@@ -281,6 +281,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  decimal:
+    dependency: "direct main"
+    description:
+      name: decimal
+      sha256: "24a261d5d5c87e86c7651c417a5dbdf8bcd7080dd592533910e8d0505a279f21"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.3"
+  dio:
+    dependency: "direct main"
+    description:
+      name: dio
+      sha256: "797e1e341c3dd2f69f2dad42564a6feff3bfb87187d05abb93b9609e6f1645c3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.4.0"
   file:
     dependency: transitive
     description:
@@ -513,6 +529,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
+  rational:
+    dependency: transitive
+    description:
+      name: rational
+      sha256: ba58e9e18df9abde280e8b10051e4bce85091e41e8e7e411b6cde2e738d357cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
   recase:
     dependency: transitive
     description:

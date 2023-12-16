@@ -1,11 +1,12 @@
-import 'package:conduit_common/src/openapi/documentable.dart';
-import 'package:conduit_open_api/src/v3/response.dart';
+import 'package:conduit_common/conduit_common.dart';
+import 'package:conduit_open_api/v3.dart';
+import 'package:ecom_backend/core/exception/user_not_found.dart';
+import 'package:ecom_backend/data/model/auth_request.dart';
+import 'package:ecom_backend/data/model/auth_response.dart';
+import 'package:ecom_backend/domain/repository/auth_repository.dart';
+import 'package:ecom_backend/ecom_backend.dart';
+import 'package:ecom_backend/util/app_error_response.dart';
 import 'package:jaguar_jwt/jaguar_jwt.dart';
-import 'package:soc_backend/data/model/auth_response.dart';
-import 'package:soc_backend/domain/repository/auth_repository.dart';
-import 'package:soc_backend/soc_backend.dart';
-import 'package:soc_backend/util/app_error_response.dart';
-import 'package:soc_backend/core/exception/user_not_found.dart';
 
 class AuthFreeTokenController extends ResourceController {
   AuthFreeTokenController(this.context, this.authRepository);
@@ -14,9 +15,12 @@ class AuthFreeTokenController extends ResourceController {
   final IAuthRepository authRepository;
 
   @Operation.post()
-  Future<Response> updateFreeToken(@Bind.query("token") String token) async {
+  Future<Response> updateFreeToken(
+      @Bind.body(require: ["refresh_token"]) AuthRequest authRequest) async {
+    final uuid = request!.raw.headers.value('UUID') ?? '';
     try {
-      final response = await authRepository.updateFreeToken(token, context);
+      final response = await authRepository.updateFreeToken(
+          authRequest.refreshToken ?? '', context, uuid);
       return Response.ok(response);
     } on JwtException catch (e) {
       return AppResponse.unauthorized(
@@ -36,8 +40,6 @@ class AuthFreeTokenController extends ResourceController {
         '',
         const UserAuthResponse(
           accessToken: '',
-          userId: '',
-          email: '',
           refreshToken: '',
           id: 0,
         ).documentSchema(context),

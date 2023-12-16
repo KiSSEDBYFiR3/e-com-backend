@@ -1,4 +1,4 @@
-name: soc_backend
+name: ecom_backend
 description: An empty conduit application.
 version: 0.0.1
 publish_to: none
@@ -10,6 +10,8 @@ dependencies:
   conduit: ^4.3.7
   conduit_core: ^4.3.6
   conduit_postgresql: ^4.4.0
+  conduit_open_api: ^4.4.0
+  conduit_common: ^4.4.0
   googleapis: ^11.4.0
   yaml: ^3.1.0
   uuid: ^3.0.7
@@ -18,6 +20,8 @@ dependencies:
   json_serializable: ^6.7.1
   json_annotation: ^4.8.1
   jwt_decoder: ^2.0.1
+  dio: ^5.4.0
+  decimal: ^2.3.3
 
 
 dev_dependencies:

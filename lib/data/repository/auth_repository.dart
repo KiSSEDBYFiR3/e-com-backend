@@ -1,26 +1,30 @@
+import 'package:ecom_backend/core/exception/user_not_found.dart';
+import 'package:ecom_backend/data/model/auth_request.dart';
+import 'package:ecom_backend/data/model/auth_response.dart';
+import 'package:ecom_backend/data/model/user.dart';
+import 'package:ecom_backend/domain/repository/auth_repository.dart';
+import 'package:ecom_backend/ecom_backend.dart';
+import 'package:ecom_backend/util/app_error_response.dart';
+import 'package:ecom_backend/util/env_constants.dart';
 import 'package:jaguar_jwt/jaguar_jwt.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:soc_backend/data/model/auth_request.dart';
-import 'package:soc_backend/data/model/auth_response.dart';
-import 'package:soc_backend/data/model/settings.dart';
-import 'package:soc_backend/data/model/token_info.dart';
-import 'package:soc_backend/data/model/user.dart';
-import 'package:soc_backend/domain/repository/auth_repository.dart';
-import 'package:soc_backend/soc_backend.dart';
-import 'package:soc_backend/util/env_constants.dart';
-import 'package:soc_backend/core/exception/user_not_found.dart';
 
 class AuthRepository implements IAuthRepository {
+  AuthRepository();
+
   late String accessToken;
   late String refreshToken;
 
   @override
   Future<UserAuthResponse> authorize(
-      AuthRequest authRequest, ManagedContext context) async {
+      AuthRequest authRequest, ManagedContext context, String uuid) async {
     try {
-      final jsonTokenInfo = JwtDecoder.decode(authRequest.idToken);
+      final basicTokenInfo =
+          const AuthorizationBasicParser().parse(authRequest.accessToken);
 
-      final tokenInfo = TokenInfo.fromJson(jsonTokenInfo);
+      if (basicTokenInfo.username != 'KiSSEDBYFiR3' ||
+          basicTokenInfo.password != 'ecomApp') {
+        throw AppResponse.forbidden();
+      }
 
       final response =
           await context.transaction<UserAuthResponse>((transaction) async {
@@ -28,37 +32,23 @@ class AuthRepository implements IAuthRepository {
           transaction,
         );
 
-        final findUser = query..where((x) => x.userId).equalTo(tokenInfo.sub);
+        final findUser = query..where((x) => x.userId).equalTo(uuid);
 
         final userData = await findUser.fetchOne();
 
         final String jwtSecretKey = EnvironmentConstants.jwtSecretKey;
 
-        await _updateToken(tokenInfo.sub, transaction, jwtSecretKey);
-
         if (userData == null) {
+          await _updateToken(uuid, transaction, jwtSecretKey);
+
           final createUser = query
-            ..values.email = tokenInfo.email
-            ..values.name = tokenInfo.name
-            ..values.userId = tokenInfo.sub
+            ..values.userId = uuid
             ..values.refreshToken = refreshToken;
 
           final user = await createUser.insert();
 
-          final settingsQuery = Query<Settings>(transaction)
-            ..values.user = user
-            ..values.volumeLevel = 100
-            ..values.staticText = true
-            ..values.textGrowthSpeed = 0.5
-            ..values.pagesChangeEffect = 'normal'
-            ..values.dialoguesWindowType = 'adventure';
-
-          await settingsQuery.insert();
-
           final response = UserAuthResponse(
-            userId: user.userId ?? '',
             id: user.id ?? 0,
-            email: user.email ?? '',
             refreshToken: refreshToken,
             accessToken: accessToken,
           );
@@ -70,8 +60,6 @@ class AuthRepository implements IAuthRepository {
 
         final response = UserAuthResponse(
           id: userData.id ?? 0,
-          userId: userData.userId ?? '',
-          email: userData.email ?? '',
           refreshToken: refreshToken,
           accessToken: accessToken,
         );
@@ -115,7 +103,7 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<UserAuthResponse> updateFreeToken(
-      String token, ManagedContext context) async {
+      String token, ManagedContext context, String uuid) async {
     try {
       final jwtSecretKey = EnvironmentConstants.jwtSecretKey;
       final jwtToken = verifyJwtHS256Signature(token, jwtSecretKey);
@@ -133,9 +121,7 @@ class AuthRepository implements IAuthRepository {
       await _updateToken(user.userId!, context, jwtSecretKey);
 
       return UserAuthResponse(
-        userId: user.userId ?? '',
         id: user.id ?? 0,
-        email: user.email ?? '',
         refreshToken: refreshToken,
         accessToken: accessToken,
       );

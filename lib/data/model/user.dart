@@ -1,17 +1,11 @@
-import 'package:conduit_core/conduit_core.dart';
-import 'package:json_annotation/json_annotation.dart';
-import 'package:soc_backend/data/model/saves.dart';
-import 'package:soc_backend/data/model/settings.dart';
+// ignore_for_file: unused_element
 
-part 'user.g.dart';
+import 'package:conduit_core/conduit_core.dart';
+import 'package:ecom_backend/data/model/cart.dart';
+import 'package:ecom_backend/data/model/favorite_model.dart';
 
 class User extends ManagedObject<_User> implements _User {}
 
-@JsonSerializable(
-  createFactory: false,
-  createToJson: true,
-  fieldRename: FieldRename.snake,
-)
 @Table(name: 'users', useSnakeCaseColumnName: true)
 class _User {
   _User({
@@ -19,8 +13,8 @@ class _User {
     this.name,
     this.id,
     this.refreshToken,
-    this.settings,
-    this.saves,
+    this.favorites,
+    this.cart,
   });
 
   @Column(primaryKey: true, autoincrement: true)
@@ -34,9 +28,6 @@ class _User {
   @Column()
   String? refreshToken;
 
-  Settings? settings;
-
-  ManagedSet<Save>? saves;
-
-  Map<String, dynamic> toJson() => _$UserToJson(this);
+  ManagedSet<FavoriteProduct>? favorites;
+  Cart? cart;
 }

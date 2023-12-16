@@ -1,10 +1,9 @@
-import 'package:soc_backend/soc_backend.dart';
 import 'package:conduit_test/conduit_test.dart';
+import 'package:ecom_backend/channel/channel.dart';
 
-export 'package:soc_backend/soc_backend.dart';
+export 'package:conduit_core/conduit_core.dart';
 export 'package:conduit_test/conduit_test.dart';
 export 'package:test/test.dart';
-export 'package:conduit_core/conduit_core.dart';
 
 /// A testing harness for soc_backend.
 ///
@@ -19,7 +18,7 @@ export 'package:conduit_core/conduit_core.dart';
 ///           });
 ///         }
 ///
-class Harness extends TestHarness<SocBackendChannel> {
+class Harness extends TestHarness<EcomBackendChannel> {
   @override
   Future onSetUp() async {}
 

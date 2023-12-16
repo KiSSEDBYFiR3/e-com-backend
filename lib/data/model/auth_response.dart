@@ -1,7 +1,8 @@
-import 'package:conduit_common/src/openapi/documentable.dart';
-import 'package:conduit_open_api/src/v3/schema.dart';
+import 'package:conduit_common/conduit_common.dart';
+import 'package:conduit_core/conduit_core.dart';
+import 'package:conduit_open_api/v3.dart';
+
 import 'package:json_annotation/json_annotation.dart';
-import 'package:soc_backend/soc_backend.dart';
 
 part 'auth_response.g.dart';
 
@@ -13,16 +14,10 @@ part 'auth_response.g.dart';
 class UserAuthResponse implements Serializable {
   const UserAuthResponse({
     required this.id,
-    required this.email,
     required this.refreshToken,
     required this.accessToken,
-    required this.userId,
-    this.name,
   });
   final int id;
-  final String userId;
-  final String email;
-  final String? name;
   final String refreshToken;
   final String accessToken;
 
@@ -32,9 +27,7 @@ class UserAuthResponse implements Serializable {
   @override
   APISchemaObject documentSchema(APIDocumentContext context) {
     return APISchemaObject.object({
-      'user_id': APISchemaObject.string(),
-      'email': APISchemaObject.string(),
-      'name': APISchemaObject.string(),
+      'id': APISchemaObject.integer(),
       'refresh_token': APISchemaObject.string(),
       'access_token': APISchemaObject.string(),
     });

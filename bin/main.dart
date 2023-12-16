@@ -1,7 +1,7 @@
-import 'package:soc_backend/soc_backend.dart';
+import 'package:ecom_backend/ecom_backend.dart';
 
 Future main() async {
-  final app = Application<SocBackendChannel>()
+  final app = Application<EcomBackendChannel>()
     ..options.configurationFilePath = "config.yaml"
     ..options.port = 80;
 

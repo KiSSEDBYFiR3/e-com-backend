@@ -1,6 +1,6 @@
-# Shadows of Chaos Backend
+# SEO Optimisation Backend
 
-  A backend for my other project - visual novel [Shadows of Chaos](https://github.com/KiSSEDBYFiR3/shadows-of-chaos).
+  A backend for my Flutter Web SEO optimisation project.
 
 
 ## Running the Application Locally

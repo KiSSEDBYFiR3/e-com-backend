@@ -1,32 +1,28 @@
 import 'package:conduit_common/conduit_common.dart';
-import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/v3.dart';
+import 'package:ecom_backend/ecom_backend.dart';
 
-class AuthRequest implements Serializable {
-  AuthRequest({
-    this.accessToken = '',
+class CartRequest implements Serializable {
+  CartRequest({
+    this.id = 0,
   });
 
-  String? accessToken;
-  String? refreshToken;
+  int id;
 
   @override
   Map<String, dynamic> asMap() => {
-        'access_token': accessToken,
-        'refresh_token': refreshToken,
+        'id': id,
       };
 
   @override
   void readFromMap(Map<String, dynamic> object) {
-    accessToken = object['access_token'];
-    refreshToken = object['refresh_token'];
+    id = object['id'];
   }
 
   @override
   APISchemaObject documentSchema(APIDocumentContext context) {
     return APISchemaObject.object({
-      'access_token': APISchemaObject.string(),
-      'refresh_token': APISchemaObject.string(),
+      'id': APISchemaObject.integer(),
     });
   }
 

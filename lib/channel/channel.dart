@@ -5,7 +5,7 @@ import 'package:ecom_backend/core/di/di.dart';
 import 'package:ecom_backend/core/di/init_service_locator.dart';
 import 'package:ecom_backend/core/exception/db_configuration_exception.dart';
 import 'package:ecom_backend/data/controllers/auth_controller.dart';
-import 'package:ecom_backend/data/controllers/auth_free_token_controller.dart';
+import 'package:ecom_backend/data/controllers/auth_token_refresh_controller.dart';
 import 'package:ecom_backend/data/controllers/auth_middleware_controller.dart';
 import 'package:ecom_backend/data/controllers/cart_controller.dart';
 import 'package:ecom_backend/data/controllers/favorites_controller.dart';
@@ -52,8 +52,8 @@ class EcomBackendChannel extends ApplicationChannel {
           sl.getObject(IAuthRepository),
         ),
       )
-      ..route(Routes.freeToken).link(
-        () => AuthFreeTokenController(
+      ..route(Routes.refresh).link(
+        () => AuthRefreshTokenController(
           context,
           sl.getObject(IAuthRepository),
         ),

@@ -1,7 +1,6 @@
 // ignore_for_file: implementation_imports
 import 'package:conduit_common/src/openapi/documentable.dart';
 import 'package:conduit_open_api/src/v3/response.dart';
-import 'package:ecom_backend/data/model/auth_request.dart';
 import 'package:ecom_backend/data/model/auth_response.dart';
 import 'package:ecom_backend/domain/repository/auth_repository.dart';
 import 'package:ecom_backend/ecom_backend.dart';
@@ -21,14 +20,13 @@ class AuthorizationController extends ResourceController {
   late String refreshToken;
 
   @Operation.post()
-  Future<Response> authorize(
-    @Bind.body(require: ['access_token']) AuthRequest authRequest,
-  ) async {
+  Future<Response> authorize() async {
     final uuid = request!.raw.headers.value('UUID') ?? '';
+    final token =
+        request!.raw.headers.value(HttpHeaders.authorizationHeader) ?? '';
 
     try {
-      final response =
-          await authRepository.authorize(authRequest, context, uuid);
+      final response = await authRepository.authorize(token, context, uuid);
 
       return Response.ok(response);
     } on JwtException catch (e) {

@@ -1,5 +1,4 @@
 import 'package:ecom_backend/core/exception/user_not_found.dart';
-import 'package:ecom_backend/data/model/auth_request.dart';
 import 'package:ecom_backend/data/model/auth_response.dart';
 import 'package:ecom_backend/data/model/user.dart';
 import 'package:ecom_backend/domain/repository/auth_repository.dart';
@@ -16,10 +15,9 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<UserAuthResponse> authorize(
-      AuthRequest authRequest, ManagedContext context, String uuid) async {
+      String token, ManagedContext context, String uuid) async {
     try {
-      final basicTokenInfo =
-          const AuthorizationBasicParser().parse(authRequest.accessToken);
+      final basicTokenInfo = const AuthorizationBasicParser().parse(token);
 
       if (basicTokenInfo.username != 'KiSSEDBYFiR3' ||
           basicTokenInfo.password != 'ecomApp') {
@@ -102,7 +100,7 @@ class AuthRepository implements IAuthRepository {
   }
 
   @override
-  Future<UserAuthResponse> updateFreeToken(
+  Future<UserAuthResponse> tokenRefresh(
       String token, ManagedContext context, String uuid) async {
     try {
       final jwtSecretKey = EnvironmentConstants.jwtSecretKey;

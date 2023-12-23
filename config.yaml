@@ -1,5 +1,5 @@
-username: "soc_user"
-password: "Shadows0fCha0s"
-host: "postgres"
+username: "user"
+password: "postgres123"
+host: "localhost"
 port: 5432
-databaseName: "soc_db"
+databaseName: "ecom_db"

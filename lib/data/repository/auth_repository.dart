@@ -1,5 +1,6 @@
 import 'package:ecom_backend/core/exception/user_not_found.dart';
 import 'package:ecom_backend/data/model/auth_response.dart';
+import 'package:ecom_backend/data/model/cart.dart';
 import 'package:ecom_backend/data/model/user.dart';
 import 'package:ecom_backend/domain/repository/auth_repository.dart';
 import 'package:ecom_backend/ecom_backend.dart';
@@ -44,6 +45,12 @@ class AuthRepository implements IAuthRepository {
             ..values.refreshToken = refreshToken;
 
           final user = await createUser.insert();
+
+          final createCart = Query<Cart>(context)
+            ..values.price = '0'
+            ..values.user = user;
+
+          await createCart.insert();
 
           final response = UserAuthResponse(
             id: user.id ?? 0,

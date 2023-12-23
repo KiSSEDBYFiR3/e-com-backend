@@ -30,7 +30,7 @@ class FavoritesRepository implements IFavoritesRepository {
 
       final product = ProductModelDto.fromJson(json);
 
-      final response = await context.transaction((transaction) async {
+      final favorites = await context.transaction((transaction) async {
         final query = Query<FavoriteProduct>(transaction)
           ..where(
             (x) => x.user?.userId == userId,
@@ -50,11 +50,7 @@ class FavoritesRepository implements IFavoritesRepository {
         return products;
       });
 
-      if (response == null) {
-        throw AppResponse.badRequest();
-      }
-
-      return response;
+      return favorites ?? [];
     } on DioException catch (_) {
       rethrow;
     } on QueryException catch (_) {
@@ -82,11 +78,8 @@ class FavoritesRepository implements IFavoritesRepository {
         final favorites = await query.fetch();
         return favorites;
       });
-      if (favorites == null) {
-        throw AppResponse.badRequest();
-      }
 
-      return favorites;
+      return favorites ?? [];
     } on QueryException catch (_) {
       rethrow;
     }
@@ -99,7 +92,8 @@ class FavoritesRepository implements IFavoritesRepository {
       final query = Query<FavoriteProduct>(context)
         ..where((x) => x.user?.userId == userId);
       final favorites = await query.fetch();
-      return favorites;
+
+      return favorites ?? [];
     } on QueryException catch (_) {
       rethrow;
     }

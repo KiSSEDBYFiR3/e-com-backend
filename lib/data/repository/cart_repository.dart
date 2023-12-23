@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:isolate';
+import 'package:decimal/decimal.dart';
 import 'package:dio/dio.dart' hide Response;
 import 'package:ecom_backend/data/model/cart.dart';
 import 'package:ecom_backend/data/model/cart_product.dart';
@@ -49,7 +50,13 @@ class CartRepository implements ICartRepository {
 
         await queryCartProduct.insert();
 
-        final updatedCart = await queryCart.fetchOne();
+        final newCartPrice =
+            Decimal.parse(cart.price) + Decimal.parse(product.price ?? '0');
+
+        final updateCart = queryCart..values.price = newCartPrice.toString();
+
+        final updatedCart = await updateCart.updateOne();
+
         if (updatedCart == null) {
           throw AppResponse.serverError('Unexpected error');
         }
@@ -89,9 +96,16 @@ class CartRepository implements ICartRepository {
           ..where((x) => x.cart?.id == cart.id)
           ..where((x) => x.id == id);
 
+        final product = await queryCartProduct.fetchOne();
+
         await queryCartProduct.delete();
 
-        final updatedCart = await queryCart.fetchOne();
+        final newCartPrice =
+            Decimal.parse(cart.price) + Decimal.parse(product?.price ?? '0');
+
+        final updateCart = queryCart..values.price = newCartPrice.toString();
+
+        final updatedCart = await updateCart.updateOne();
 
         return updatedCart;
       });

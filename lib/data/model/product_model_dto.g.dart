@@ -12,7 +12,7 @@ ProductModelDto _$ProductModelDtoFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String?,
       id: json['id'] as int?,
       image: json['image'] as String?,
-      price: json['price'] as String?,
+      price: json['price'] as num?,
       title: json['title'] as String?,
     );
 

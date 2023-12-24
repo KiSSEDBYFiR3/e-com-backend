@@ -1,5 +1,5 @@
-import 'package:conduit_common/src/openapi/documentable.dart';
-import 'package:conduit_open_api/src/v3/schema.dart';
+import 'package:conduit_common/conduit_common.dart';
+import 'package:conduit_open_api/v3.dart';
 import 'package:ecom_backend/ecom_backend.dart';
 import 'package:ecom_backend/util/json.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -20,7 +20,6 @@ class ProductModelDto implements Serializable {
     this.price,
     this.title,
   });
-
   factory ProductModelDto.fromJson(Json json) =>
       _$ProductModelDtoFromJson(json);
 
@@ -32,7 +31,7 @@ class ProductModelDto implements Serializable {
 
   final String? title;
 
-  final String? price;
+  final num? price;
 
   final String? category;
 

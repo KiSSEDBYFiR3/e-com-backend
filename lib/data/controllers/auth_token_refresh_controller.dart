@@ -14,14 +14,17 @@ class AuthRefreshTokenController extends ResourceController {
   final IAuthRepository authRepository;
 
   @Operation.post()
-  Future<Response> updateFreeToken() async {
+  Future<Response> refreshToken() async {
     final uuid = request!.raw.headers.value('UUID') ?? '';
     final token =
         request!.raw.headers.value(HttpHeaders.authorizationHeader) ?? '';
 
     try {
       final response = await authRepository.tokenRefresh(token, context, uuid);
-      return Response.ok(response);
+      return Response.ok(
+        response,
+        headers: {"Content-Type": "application/json"},
+      );
     } on JwtException catch (e) {
       return AppResponse.unauthorized(
         title: 'Invalid token',

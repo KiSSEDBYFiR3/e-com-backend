@@ -2,7 +2,6 @@ import 'package:conduit_common/conduit_common.dart';
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/v3.dart';
 import 'package:ecom_backend/data/model/favorite_model.dart';
-import 'package:ecom_backend/data/model/favorites_request.dart';
 import 'package:ecom_backend/domain/repository/favorites_repository.dart';
 import 'package:ecom_backend/util/app_error_response.dart';
 
@@ -15,15 +14,17 @@ class FavoritesController extends ResourceController {
   final IFavoritesRepository repository;
   final ManagedContext context;
 
-  @Operation.post()
-  Future<Response> addToFavorites(
-      @Bind.body(require: ['id'])
-      final FavoritesRequest favoritesRequest) async {
+  @Operation.post('id')
+  Future<Response> addToFavorites() async {
     final userId = request!.attachments['userId'] as String;
+    final id = request!.raw.requestedUri.queryParameters['id'];
+    if (id == null) {
+      return AppResponse.badRequest();
+    }
 
     try {
       final response = await repository.addToFavorites(
-        id: favoritesRequest.id,
+        id: int.parse(id),
         userId: userId,
         context: context,
       );
@@ -42,7 +43,10 @@ class FavoritesController extends ResourceController {
     try {
       final favoritesResponse =
           await repository.getFavorites(userId: userId, context: context);
-      return Response.ok(favoritesResponse);
+      return Response.ok(
+        favoritesResponse,
+        headers: {"Content-Type": "application/json"},
+      );
     } catch (e) {
       logger.severe(e.toString());
 
@@ -51,14 +55,17 @@ class FavoritesController extends ResourceController {
   }
 
   @Operation.delete('id')
-  Future<Response> deleteFromFavorites(
-      @Bind.path('id') final FavoritesRequest favoritesRequest) async {
+  Future<Response> deleteFromFavorites() async {
     final userId = request!.attachments['userId'] as String;
+    final id = request!.raw.requestedUri.queryParameters['id'];
+    if (id == null) {
+      return AppResponse.badRequest();
+    }
     try {
       final favoritesResponse = await repository.deleteFromFavorites(
         userId: userId,
         context: context,
-        id: favoritesRequest.id,
+        id: int.parse(id),
       );
       return Response.ok(favoritesResponse);
     } catch (e) {

@@ -15,9 +15,13 @@ class _CartProduct {
     this.image,
     this.price,
     this.title,
+    this.productId,
   });
   @Column(autoincrement: true, primaryKey: true)
-  final int id;
+  int? id;
+
+  @Column(name: 'product_id')
+  int? productId;
 
   @Column()
   String? image;

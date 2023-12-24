@@ -3,7 +3,7 @@ import 'package:ecom_backend/ecom_backend.dart';
 Future main() async {
   final app = Application<EcomBackendChannel>()
     ..options.configurationFilePath = "config.yaml"
-    ..options.port = 80;
+    ..options.port = 8888;
 
   await app.startOnCurrentIsolate();
 

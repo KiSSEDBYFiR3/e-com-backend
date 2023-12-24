@@ -7,7 +7,6 @@ part of 'token_info.dart';
 // **************************************************************************
 
 TokenInfo _$TokenInfoFromJson(Map<String, dynamic> json) => TokenInfo(
-      email: json['email'] as String,
       name: json['name'] as String,
       sub: json['sub'] as String,
       pitcure: json['pitcure'] as String?,
@@ -15,7 +14,6 @@ TokenInfo _$TokenInfoFromJson(Map<String, dynamic> json) => TokenInfo(
 
 Map<String, dynamic> _$TokenInfoToJson(TokenInfo instance) => <String, dynamic>{
       'name': instance.name,
-      'email': instance.email,
       'sub': instance.sub,
       'pitcure': instance.pitcure,
     };

@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'package:conduit_common/conduit_common.dart';
 import 'package:conduit_core/conduit_core.dart';
 import 'package:conduit_open_api/v3.dart';
 import 'package:ecom_backend/data/model/cart.dart';
-import 'package:ecom_backend/data/model/cart_request.dart';
 import 'package:ecom_backend/domain/repository/cart_repository.dart';
 import 'package:ecom_backend/util/app_error_response.dart';
 
@@ -15,17 +15,24 @@ class CartController extends ResourceController {
   final ManagedContext context;
   final ICartRepository repository;
 
-  @Operation.post()
-  Future<Response> addToCart(
-      @Bind.body(require: ['id']) final CartRequest cartRequest) async {
-    final userId = request!.attachments['userId'] as String;
+  @Operation.post('id')
+  Future<Response> addToCart() async {
+    final userId = request!.attachments['userId'] as String? ?? '';
+    final id = request!.raw.requestedUri.queryParameters['id'];
+    if (id == null) {
+      return AppResponse.badRequest();
+    }
+
     try {
       final cart = await repository.addToCart(
         context: context,
         userId: userId,
-        id: cartRequest.id,
+        id: int.parse(id),
       );
-      return Response.ok(cart);
+      return Response.ok(
+        cart,
+        headers: {"Content-Type": "application/json"},
+      );
     } catch (e) {
       logger.severe(e.toString());
       return AppResponse.serverError(e.toString());
@@ -33,15 +40,17 @@ class CartController extends ResourceController {
   }
 
   @Operation.delete('id')
-  Future<Response> deleteFromCart(
-      @Bind.path('id') final CartRequest cartRequest) async {
+  Future<Response> deleteFromCart() async {
     final userId = request!.attachments['userId'] as String;
-
+    final id = request!.raw.requestedUri.queryParameters['id'];
+    if (id == null) {
+      return AppResponse.badRequest();
+    }
     try {
       final cart = await repository.deleteFromCart(
         context: context,
         userId: userId,
-        id: cartRequest.id,
+        id: int.parse(id),
       );
       return Response.ok(cart);
     } catch (e) {

@@ -1,10 +1,8 @@
-import 'dart:convert';
-import 'dart:isolate';
-
 import 'package:conduit_core/conduit_core.dart';
 import 'package:dio/dio.dart' hide Response;
 import 'package:ecom_backend/data/model/favorite_model.dart';
 import 'package:ecom_backend/data/model/product_model_dto.dart';
+import 'package:ecom_backend/data/model/user.dart';
 import 'package:ecom_backend/domain/repository/favorites_repository.dart';
 import 'package:ecom_backend/util/app_error_response.dart';
 
@@ -15,7 +13,7 @@ class FavoritesRepository implements IFavoritesRepository {
   final Dio dio;
 
   @override
-  Future<List<FavoriteProduct>> addToFavorites({
+  Future<List<ProductModelDto>> addToFavorites({
     required int id,
     required String userId,
     required ManagedContext context,
@@ -26,29 +24,42 @@ class FavoritesRepository implements IFavoritesRepository {
       if (productResponse.data == null) {
         throw AppResponse.notFound(title: 'product not found');
       }
-      final json = await Isolate.run(() => jsonDecode(productResponse.data));
+      final json = productResponse.data as Map<String, dynamic>;
 
       final product = ProductModelDto.fromJson(json);
 
-      final favorites = await context.transaction((transaction) async {
-        final query = Query<FavoriteProduct>(transaction)
-          ..where(
-            (x) => x.user?.userId == userId,
-          );
+      final favorites = await context.transaction(
+        (transaction) async {
+          final userQuery = Query<User>(transaction)
+            ..where((x) => x.userId).equalTo(userId);
+          final user = await userQuery.fetchOne();
 
-        final insertQuery = query
-          ..values.category = product.category
-          ..values.id = product.id
-          ..values.image = product.image
-          ..values.price = product.price
-          ..values.description = product.description
-          ..values.title = product.title;
+          if (user == null) {
+            throw AppResponse.badRequest();
+          }
 
-        await insertQuery.insert();
+          final query = Query<FavoriteProduct>(transaction)
+            ..where((x) => x.user?.id).equalTo(user.id);
 
-        final products = await query.fetch();
-        return products;
-      });
+          final insertQuery = query
+            ..values.category = product.category
+            ..values.productId = product.id
+            ..values.image = product.image
+            ..values.price = product.price?.toString()
+            ..values.description = product.description
+            ..values.title = product.title
+            ..values.user = user;
+
+          await insertQuery.insert();
+
+          final favoritesQuery = Query<FavoriteProduct>(context)
+            ..where((x) => x.user?.id).equalTo(user.id);
+
+          final favorites = await favoritesQuery.fetch();
+
+          return favorites.map(_mapFavoritesProductToDto).toList();
+        },
+      );
 
       return favorites ?? [];
     } on DioException catch (_) {
@@ -58,25 +69,44 @@ class FavoritesRepository implements IFavoritesRepository {
     }
   }
 
+  ProductModelDto _mapFavoritesProductToDto(FavoriteProduct products) {
+    return ProductModelDto(
+      id: products.productId,
+      category: products.category,
+      description: products.description,
+      image: products.image,
+      price: double.parse(products.price ?? '0'),
+      title: products.title,
+    );
+  }
+
   @override
-  Future<List<FavoriteProduct>> deleteFromFavorites(
+  Future<List<ProductModelDto>> deleteFromFavorites(
       {required int id,
       required String userId,
       required ManagedContext context}) async {
     try {
       final favorites = await context.transaction((transaction) async {
-        final query = Query<FavoriteProduct>(transaction)
-          ..where((x) => x.user?.userId == userId);
+        final userQuery = Query<User>(transaction)
+          ..where((x) => x.userId).equalTo(userId);
+        final user = await userQuery.fetchOne();
 
-        final deleteQuery = query
-          ..where(
-            (x) => x.id == id,
-          );
+        if (user == null) {
+          throw AppResponse.badRequest();
+        }
+        final query = Query<FavoriteProduct>(transaction)
+          ..where((x) => x.user?.id).equalTo(user.id);
+
+        final deleteQuery = query..where((x) => x.productId).equalTo(id);
 
         await deleteQuery.delete();
 
-        final favorites = await query.fetch();
-        return favorites;
+        final favoritesQuery = Query<FavoriteProduct>(context)
+          ..where((x) => x.user?.id).equalTo(user.id);
+
+        final favorites = await favoritesQuery.fetch();
+
+        return favorites.map(_mapFavoritesProductToDto).toList();
       });
 
       return favorites ?? [];
@@ -86,14 +116,22 @@ class FavoritesRepository implements IFavoritesRepository {
   }
 
   @override
-  Future<List<FavoriteProduct>> getFavorites(
+  Future<List<ProductModelDto>> getFavorites(
       {required String userId, required ManagedContext context}) async {
     try {
-      final query = Query<FavoriteProduct>(context)
-        ..where((x) => x.user?.userId == userId);
-      final favorites = await query.fetch();
+      final favorites = await context.transaction(
+        (transaction) async {
+          final query = Query<User>(transaction)
+            ..where((x) => x.userId).equalTo(userId)
+            ..join(set: (x) => x.favorites);
 
-      return favorites ?? [];
+          final userWithFavorites = await query.fetchOne();
+
+          return userWithFavorites?.favorites;
+        },
+      );
+
+      return favorites?.map(_mapFavoritesProductToDto).toList() ?? [];
     } on QueryException catch (_) {
       rethrow;
     }

@@ -18,22 +18,28 @@ class AuthRepository implements IAuthRepository {
   Future<UserAuthResponse> authorize(
       String token, ManagedContext context, String uuid) async {
     try {
-      final basicTokenInfo = const AuthorizationBasicParser().parse(token);
+      if (token.contains('Bearer')) {
+        _bearerValidator(token);
+      } else {
+        final basicTokenInfo = const AuthorizationBasicParser().parse(token);
 
-      if (basicTokenInfo.username != 'KiSSEDBYFiR3' ||
-          basicTokenInfo.password != 'ecomApp') {
-        throw AppResponse.forbidden();
+        if (basicTokenInfo.username != 'KiSSEDBYFiR3' ||
+            basicTokenInfo.password != 'ecomApp') {
+          throw AppResponse.forbidden();
+        }
       }
-
-      final response =
-          await context.transaction<UserAuthResponse>((transaction) async {
+      final user = await context.transaction<User>((transaction) async {
         final query = Query<User>(
           transaction,
         );
 
+        print(query.toString());
+
         final findUser = query..where((x) => x.userId).equalTo(uuid);
 
         final userData = await findUser.fetchOne();
+
+        print(userData.toString());
 
         final String jwtSecretKey = EnvironmentConstants.jwtSecretKey;
 
@@ -46,38 +52,44 @@ class AuthRepository implements IAuthRepository {
 
           final user = await createUser.insert();
 
-          final createCart = Query<Cart>(context)
+          print(user);
+          final createCart = Query<Cart>(transaction)
             ..values.price = '0'
             ..values.user = user;
 
           await createCart.insert();
 
-          final response = UserAuthResponse(
-            id: user.id ?? 0,
-            refreshToken: refreshToken,
-            accessToken: accessToken,
-          );
-
-          return response;
+          return user;
         }
 
         await _updateToken(userData.userId ?? '', transaction, jwtSecretKey);
-
-        final response = UserAuthResponse(
-          id: userData.id ?? 0,
-          refreshToken: refreshToken,
-          accessToken: accessToken,
-        );
-        return response;
+        return userData;
       });
-      if (response == null) {
+
+      if (user == null) {
         throw Exception();
       }
+
+      final response = UserAuthResponse(
+        id: user.id ?? 0,
+        refreshToken: refreshToken,
+        accessToken: accessToken,
+      );
+
+      print(response);
+
       return response;
     } on QueryException catch (_) {
       print(_);
       rethrow;
     }
+  }
+
+  void _bearerValidator(String token) {
+    final bearer = const AuthorizationBearerParser().parse(token) ?? '';
+    final jwtToken =
+        verifyJwtHS256Signature(bearer, EnvironmentConstants.jwtSecretKey);
+    jwtToken.validate();
   }
 
   Future<void> _updateToken(
@@ -110,13 +122,18 @@ class AuthRepository implements IAuthRepository {
   Future<UserAuthResponse> tokenRefresh(
       String token, ManagedContext context, String uuid) async {
     try {
+      final jwt = const AuthorizationBearerParser().parse(token) ?? '';
+
       final jwtSecretKey = EnvironmentConstants.jwtSecretKey;
-      final jwtToken = verifyJwtHS256Signature(token, jwtSecretKey);
+
+      final jwtToken = verifyJwtHS256Signature(jwt, jwtSecretKey);
+
       jwtToken.validate();
 
-      final id = int.parse(jwtToken['id'].toString());
+      final id = jwtToken['id'].toString();
 
-      final user = await (Query<User>(context)..where((x) => x.id).equalTo(id))
+      final user = await (Query<User>(context)
+            ..where((x) => x.userId).equalTo(id))
           .fetchOne();
 
       if (user == null) {

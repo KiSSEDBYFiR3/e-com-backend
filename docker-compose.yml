@@ -34,4 +34,3 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - 127.0.0.1:5354:80
-  

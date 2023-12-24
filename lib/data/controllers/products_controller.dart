@@ -18,7 +18,10 @@ class ProductsController extends ResourceController {
   Future<Response> getProducts() async {
     try {
       final products = await repository.getAllProducts();
-      return Response.ok(products);
+      return Response.ok(
+        products,
+        headers: {"Content-Type": "application/json"},
+      );
     } catch (e) {
       logger.severe(e.toString());
       return AppResponse.serverError(e.toString());

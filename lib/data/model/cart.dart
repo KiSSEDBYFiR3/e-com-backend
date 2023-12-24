@@ -15,7 +15,7 @@ class _Cart {
     this.user,
   });
   @Column(autoincrement: true, primaryKey: true)
-  final int id;
+  final int? id;
 
   String price;
 

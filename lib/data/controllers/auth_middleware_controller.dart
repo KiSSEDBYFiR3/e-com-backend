@@ -20,9 +20,10 @@ class AuthMiddlewareController extends Controller {
       final jwtSecretKey = EnvironmentConstants.jwtSecretKey;
 
       final jwtClaim = verifyJwtHS256Signature(tokenJWT ?? '', jwtSecretKey);
+
       jwtClaim.validate();
 
-      request.attachments["userId"] = int.parse(jwtClaim["id"].toString());
+      request.attachments["userId"] = jwtClaim["id"].toString();
 
       return request;
     } on JwtException catch (e) {

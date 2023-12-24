@@ -24,22 +24,27 @@ class AuthorizationController extends ResourceController {
     final uuid = request!.raw.headers.value('UUID') ?? '';
     final token =
         request!.raw.headers.value(HttpHeaders.authorizationHeader) ?? '';
-
     try {
       final response = await authRepository.authorize(token, context, uuid);
-
-      return Response.ok(response);
+      return Response.ok(
+        response,
+        headers: {"Content-Type": "application/json"},
+      );
     } on JwtException catch (e) {
+      logger.info(e);
       return AppResponse.unauthorized(
         title: 'Invalid token',
         details: e.message,
       );
     } on QueryException catch (e) {
-      logger.severe(e.toString());
+      logger.severe(e.message);
       return AppResponse.serverError(e, message: e.message);
-    } catch (e) {
-      logger.severe(e);
+    } on AuthorizationParserException catch (e) {
+      logger.info(e.reason);
       return AppResponse.badRequest(details: 'token is incorrect');
+    } catch (e) {
+      logger.severe(e.toString());
+      return AppResponse.serverError(e);
     }
   }
 

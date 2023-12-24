@@ -16,9 +16,13 @@ class _FavoriteProduct {
     this.price,
     this.title,
     this.user,
+    this.productId,
   });
   @Column(primaryKey: true, autoincrement: true)
   int? id;
+
+  @Column()
+  int? productId;
 
   @Column()
   String? image;

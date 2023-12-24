@@ -19,7 +19,10 @@ class OrderController extends ResourceController {
     try {
       final response =
           await repository.createOrder(context: context, userId: userId);
-      return Response.ok(response);
+      return Response.ok(
+        response,
+        headers: {"Content-Type": "application/json"},
+      );
     } catch (e) {
       logger.severe(e.toString());
 

@@ -1,5 +1,3 @@
-import 'dart:isolate';
-
 import 'package:dio/dio.dart' hide Response;
 import 'package:ecom_backend/data/model/product_model_dto.dart';
 import 'package:ecom_backend/domain/repository/products_repository.dart';
@@ -20,9 +18,8 @@ class ProductRepository implements IProductsRepository {
       if (productsResponse.data == null) {
         throw AppResponse.notFound();
       }
-      final productsList = await Isolate.run(() =>
-          _deserializeListProductModelDto(
-              productsResponse.data!.cast<Map<String, dynamic>>()));
+      final productsList = _deserializeListProductModelDto(
+          productsResponse.data!.cast<Map<String, dynamic>>());
 
       return productsList;
     } on DioException catch (_) {

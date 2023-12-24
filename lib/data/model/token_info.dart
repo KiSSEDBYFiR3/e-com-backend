@@ -9,7 +9,6 @@ part 'token_info.g.dart';
 )
 class TokenInfo {
   const TokenInfo({
-    required this.email,
     required this.name,
     required this.sub,
     this.pitcure,
@@ -18,7 +17,6 @@ class TokenInfo {
       _$TokenInfoFromJson(json);
 
   final String name;
-  final String email;
   final String sub;
   final String? pitcure;
 

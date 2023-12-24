@@ -166,7 +166,7 @@ String _calculatePrice(List<CartProduct> products) {
 
 ProductModelDto _mapCartProductToDto(CartProduct products) {
   return ProductModelDto(
-    id: products.id,
+    id: products.productId,
     category: products.category,
     description: products.description,
     image: products.image,

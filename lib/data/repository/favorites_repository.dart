@@ -28,7 +28,7 @@ class FavoritesRepository implements IFavoritesRepository {
 
       final product = ProductModelDto.fromJson(json);
 
-      final favorites = await context.transaction(
+      final user = await context.transaction(
         (transaction) async {
           final userQuery = Query<User>(transaction)
             ..where((x) => x.userId).equalTo(userId);
@@ -51,17 +51,16 @@ class FavoritesRepository implements IFavoritesRepository {
             ..values.user = user;
 
           await insertQuery.insert();
-
-          final favoritesQuery = Query<FavoriteProduct>(context)
-            ..where((x) => x.user?.id).equalTo(user.id);
-
-          final favorites = await favoritesQuery.fetch();
-
-          return favorites.map(_mapFavoritesProductToDto).toList();
+          return user;
         },
       );
 
-      return favorites ?? [];
+      final favoritesQuery = Query<FavoriteProduct>(context)
+        ..where((x) => x.user?.id).equalTo(user?.id);
+
+      final favorites = await favoritesQuery.fetch();
+
+      return favorites.map(_mapFavoritesProductToDto).toList();
     } on DioException catch (_) {
       rethrow;
     } on QueryException catch (_) {
@@ -86,7 +85,7 @@ class FavoritesRepository implements IFavoritesRepository {
       required String userId,
       required ManagedContext context}) async {
     try {
-      final favorites = await context.transaction((transaction) async {
+      final user = await context.transaction((transaction) async {
         final userQuery = Query<User>(transaction)
           ..where((x) => x.userId).equalTo(userId);
         final user = await userQuery.fetchOne();
@@ -101,15 +100,14 @@ class FavoritesRepository implements IFavoritesRepository {
 
         await deleteQuery.delete();
 
-        final favoritesQuery = Query<FavoriteProduct>(context)
-          ..where((x) => x.user?.id).equalTo(user.id);
-
-        final favorites = await favoritesQuery.fetch();
-
-        return favorites.map(_mapFavoritesProductToDto).toList();
+        return user;
       });
+      final favoritesQuery = Query<FavoriteProduct>(context)
+        ..where((x) => x.user?.id).equalTo(user?.id);
 
-      return favorites ?? [];
+      final favorites = await favoritesQuery.fetch();
+
+      return favorites.map(_mapFavoritesProductToDto).toList() ?? [];
     } on QueryException catch (_) {
       rethrow;
     }

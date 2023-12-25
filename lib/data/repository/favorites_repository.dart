@@ -107,7 +107,7 @@ class FavoritesRepository implements IFavoritesRepository {
 
       final favorites = await favoritesQuery.fetch();
 
-      return favorites.map(_mapFavoritesProductToDto).toList() ?? [];
+      return favorites.map(_mapFavoritesProductToDto).toList();
     } on QueryException catch (_) {
       rethrow;
     }

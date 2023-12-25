@@ -138,6 +138,14 @@ class CartRepository implements ICartRepository {
           throw AppResponse.serverError('Unexpected Error');
         }
 
+        final updatedCartProductsQuery = Query<CartProduct>(transaction)
+          ..where((x) => x.cart?.id).equalTo(cart.id);
+
+        final updatedCartProducts = await updatedCartProductsQuery.fetch();
+
+        // join method by unknown reasons returns list of only one related object, so we have what we have
+        cart.products = ManagedSet.from(updatedCartProducts);
+
         return cart;
       });
 

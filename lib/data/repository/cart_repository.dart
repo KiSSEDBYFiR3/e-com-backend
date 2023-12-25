@@ -98,14 +98,16 @@ class CartRepository implements ICartRepository {
         }
 
         final queryCartProduct = Query<CartProduct>(transaction)
-          ..where((x) => x.cart?.id).equalTo(cart.id)
-          ..where((x) => x.id).equalTo(id);
+          ..where((x) => x.cart?.id).equalTo(cart.id);
 
-        await queryCartProduct.delete();
+        final deleteQuery = queryCartProduct
+          ..where((x) => x.productId).equalTo(id);
+
+        await deleteQuery.delete();
+        await queryCartProduct.fetch();
 
         final updatedCartProductsQuery = Query<CartProduct>(transaction)
           ..where((x) => x.cart?.id).equalTo(cart.id);
-
         final updatedCartProducts = await updatedCartProductsQuery.fetch();
 
         // join method by unknown reasons returns list of only one related object, so we have what we have

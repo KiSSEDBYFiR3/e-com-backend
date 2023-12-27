@@ -1,5 +1,5 @@
 username: "user"
 password: "postgres123"
-host: "ecom_postgres"
+host: "127.0.0.1"
 port: 5432
 databaseName: "ecom_db"

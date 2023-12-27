@@ -29,6 +29,17 @@ class EcomBackendChannel extends ApplicationChannel {
     ServiceLocator.init();
     sl = ServiceLocator.instance;
 
+    CORSPolicy.defaultPolicy
+      ..allowedOrigins = ['*']
+      ..allowedRequestHeaders.addAll([
+        'Uuid',
+        'Referer',
+        'Authorization',
+        'User-Agent',
+        'Content-Type',
+      ])
+      ..allowedMethods.add('OPTIONS');
+
     registerServices(sl);
 
     final postgresDB = await _configureDB();
@@ -45,7 +56,7 @@ class EcomBackendChannel extends ApplicationChannel {
 
   @override
   Controller get entryPoint {
-    final router = Router();
+    final router = ORouter();
 
     router
       ..route(Routes.auth).link(
@@ -130,5 +141,13 @@ class EcomBackendChannel extends ApplicationChannel {
       dev.log(e.toString());
       throw DBConfigurationException(e.toString());
     }
+  }
+}
+
+class ORouter extends Router {
+  @override
+  Future receive(Request req) {
+    print(req);
+    return super.receive(req);
   }
 }

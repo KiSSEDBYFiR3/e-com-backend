@@ -29,17 +29,6 @@ class EcomBackendChannel extends ApplicationChannel {
     ServiceLocator.init();
     sl = ServiceLocator.instance;
 
-    CORSPolicy.defaultPolicy
-      ..allowedOrigins = ['*']
-      ..allowedRequestHeaders.addAll([
-        'Uuid',
-        'Referer',
-        'Authorization',
-        'User-Agent',
-        'Content-Type',
-      ])
-      ..allowedMethods.add('OPTIONS');
-
     registerServices(sl);
 
     final postgresDB = await _configureDB();
@@ -146,8 +135,28 @@ class EcomBackendChannel extends ApplicationChannel {
 
 class ORouter extends Router {
   @override
-  Future receive(Request req) {
-    print(req);
+  CORSPolicy? get policy => CORSPolicy.defaultPolicy
+    ..allowedOrigins = ['*']
+    ..allowedRequestHeaders.addAll([
+      'Uuid',
+      'Referer',
+      'Authorization',
+      'User-Agent',
+      'Content-Type',
+      'Accept-Encoding',
+      'Sec-Fetch-Dest',
+      'Sec-Fetch-Mode',
+      'Sec-Fetch-Site',
+      'Pragma',
+      'Connection',
+      'Cache-Control',
+      'uuid',
+    ])
+    ..allowedMethods.add('OPTIONS');
+
+  @override
+  Future receive(Request req) async {
+    logger.warning(req.raw.headers);
     return super.receive(req);
   }
 }

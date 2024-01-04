@@ -153,10 +153,4 @@ class ORouter extends Router {
       'uuid',
     ])
     ..allowedMethods.add('OPTIONS');
-
-  @override
-  Future receive(Request req) async {
-    logger.warning(req.raw.headers);
-    return super.receive(req);
-  }
 }

@@ -1,7 +1,6 @@
-# SEO Optimisation Backend
+# Ecommerce App Backend
 
   A backend for my Flutter Web SEO optimisation project.
-
 
 ## Running the Application Locally
 
